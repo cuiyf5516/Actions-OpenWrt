@@ -18,8 +18,8 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
-        #  schedule:
-        #    - cron: 0 8 * * FRI
+  schedule:
+    - cron: 0 8 * * FRI
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -183,10 +183,11 @@ jobs:
         keep_minimum_runs: 3
 
     - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@v0.1.0
+      uses: dev-drprasad/delete-older-releases@v0.2.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 3
         delete_tags: true
+        delete_tag_pattern: R2S-TEST
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

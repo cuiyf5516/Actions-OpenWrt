@@ -15,3 +15,6 @@ sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generat
 
 # Clone serverchan
 # git clone https://github.com/tty228/luci-app-serverchan.git package/lean/luci-app-serverchan
+
+# Modify default kernel
+sed -i 's/5.10/5.15/g' target/linux/rockchip/Makefile

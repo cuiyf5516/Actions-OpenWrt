@@ -18,3 +18,4 @@ sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generat
 
 # Modify default kernel
 # sed -i 's/5.15/6.1/g' target/linux/rockchip/Makefile
+sed -i 's/6.1/6.6/g' target/linux/x86/Makefile

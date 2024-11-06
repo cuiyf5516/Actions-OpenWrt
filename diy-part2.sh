@@ -12,10 +12,11 @@
 
 # Modify default IP
 sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/luci2/bin/config_generate
 
 # Clone serverchan
 # git clone https://github.com/tty228/luci-app-serverchan.git package/lean/luci-app-serverchan
 
 # Modify default kernel
-sed -i 's/6.1/6.6/g' target/linux/rockchip/Makefile
-sed -i 's/6.1/6.6/g' target/linux/x86/Makefile
+# sed -i 's/6.1/6.6/g' target/linux/rockchip/Makefile
+# sed -i 's/6.1/6.6/g' target/linux/x86/Makefile

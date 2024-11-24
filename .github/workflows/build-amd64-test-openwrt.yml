@@ -18,15 +18,15 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
-  schedule:
-    - cron: 0 14 1,15 * *
+#  schedule:
+#    - cron: 0 14 1 * *
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   DEPENDS_FILE: depends-ubuntu
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: amd64.config
+  CONFIG_FILE: amd64-test.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false

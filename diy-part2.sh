@@ -19,4 +19,4 @@ sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/luci2/bin/config_generat
 
 # Modify default kernel
 # sed -i 's/6.1/6.6/g' target/linux/rockchip/Makefile
-# sed -i 's/6.1/6.6/g' target/linux/x86/Makefile
+sed -i 's/6.6/6.12/g' target/linux/x86/Makefile

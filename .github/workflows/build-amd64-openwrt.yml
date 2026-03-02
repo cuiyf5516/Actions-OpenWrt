@@ -80,6 +80,13 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
+    - name: Cache
+      uses: stupidloud/cachewrtbuild@main
+      with:
+        ccache: 'true'
+        mixkey: 'amd64'
+        prefix: ${{ github.workspace }}/openwrt
+
     - name: Load custom feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default

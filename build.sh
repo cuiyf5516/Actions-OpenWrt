@@ -18,9 +18,9 @@ update_code()
 
 check_config()
 {
-	local config_file=amd64.config
+	local config_file=config/amd64.config
         if [ x"$1" = x"r2s" ];then
-                config_file=r2s.config
+                config_file=config/r2s.config
         fi
 	echo "----------checking $config_file---------"
 	cd $SCRIPT_DIR/lede

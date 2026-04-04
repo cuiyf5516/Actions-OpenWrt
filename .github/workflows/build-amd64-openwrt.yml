@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/_build-openwrt-reusable.yml
     with:
       ssh: ${{ github.event.inputs.ssh || 'false' }}
-      config_file: amd64.config
+      config_file: config/amd64.config
       cache_mixkey: amd64
       release_prefix: AMD64
     secrets: inherit

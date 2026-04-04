@@ -30,7 +30,7 @@ jobs:
     uses: ./.github/workflows/_build-openwrt-reusable.yml
     with:
       ssh: ${{ github.event.inputs.ssh || 'false' }}
-      config_file: r2s.config
+      config_file: config/r2s.config
       cache_mixkey: aarch64
       release_prefix: R2S
     secrets: inherit

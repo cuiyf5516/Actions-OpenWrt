@@ -1,93 +1,88 @@
-#!/bin/sh
+#!/bin/bash
 
-WORKDIR="/home/sky/build/lede"
-ORI_DIR="$(pwd)"
-SCRIPT_DIR="$(cd "$(dirname ${0})"; pwd)"
+set -eu
 
-update_code()
-{
+resolve_repo_dir() {
+	local source_path="${BASH_SOURCE[0]}"
+	local source_dir=""
+
+	while [ -L "$source_path" ]; do
+		source_dir="$(cd -P "$(dirname "$source_path")" && pwd)"
+		source_path="$(readlink "$source_path")"
+		if [[ "$source_path" != /* ]]; then
+			source_path="$source_dir/$source_path"
+		fi
+	done
+
+	cd -P "$(dirname "$source_path")" && pwd
+}
+
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(resolve_repo_dir)"
+LEDE_DIR="$SCRIPT_DIR/lede"
+
+update_code() {
 	echo "----------updating---------"
-	cd $SCRIPT_DIR/lede
-	git pull || exit 1
-	#cd package/lean/luci-app-serverchan
-        #git pull
-        #cd ../../../
-	./scripts/feeds update -a && ./scripts/feeds install -a -f || exit 2
+	cd "$LEDE_DIR"
+	git pull
+	# cd package/lean/luci-app-serverchan
+	# git pull
+	# cd -
+	./scripts/feeds update -a
+	./scripts/feeds install -a -f
 	echo "-----------end-------------"
 }
 
-check_config()
-{
-	local config_file=config/amd64.config
-        if [ x"$1" = x"r2s" ];then
-                config_file=config/r2s.config
-        fi
+check_config() {
+	local config_file="config/amd64.config"
+
+	if [ "${1:-}" = "r2s" ]; then
+		config_file="config/r2s.config"
+	fi
+
 	echo "----------checking $config_file---------"
-	cd $SCRIPT_DIR/lede
-	cp ../Actions-OpenWrt-Lean/$config_file .config
-	make defconfig || exit 3
-	./scripts/diffconfig.sh > seed.config || exit 4
+	cd "$LEDE_DIR"
+	cp "$REPO_DIR/$config_file" .config
+	make defconfig
+	./scripts/diffconfig.sh > seed.config
 	echo "---echo seed.config diff---"
-	diff -u ../Actions-OpenWrt-Lean/$config_file seed.config
-	if [ $? -ne 0 ];then
-		echo "move to ../Actions-OpenWrt-Lean/$config_file"
-		cp seed.config ../Actions-OpenWrt-Lean/$config_file
+	if ! diff -u "$REPO_DIR/$config_file" seed.config; then
+		echo "move to $REPO_DIR/$config_file"
+		cp seed.config "$REPO_DIR/$config_file"
 	fi
 	echo "-----------end-------------"
-	#cd $ORI_DIR
 }
 
-check_test_config()
-{
-        local config_file=amd64-test.config
-        if [ x"$1" = x"r2s" ];then
-                config_file=r2s-test.config
-        fi
-        echo "----------checking $config_file---------"
-        cd $SCRIPT_DIR/lede
-        cp ../Actions-OpenWrt-Lean/$config_file .config
-        make defconfig || exit 3
-        ./scripts/diffconfig.sh > seed.config || exit 4
-        echo "---echo seed.config diff---"
-        diff -u ../Actions-OpenWrt-Lean/$config_file seed.config
-        if [ $? -ne 0 ];then
-                echo "move to ../Actions-OpenWrt-Lean/$config_file"
-                cp seed.config ../Actions-OpenWrt-Lean/$config_file
-        fi
-        echo "-----------end-------------"
-        #cd $ORI_DIR
-}
-
-build_code()
-{
+build_code() {
 	echo "----------building---------"
-	cd $SCRIPT_DIR/lede
-	if [ "$1"x = "clean"x ];then
+	cd "$LEDE_DIR"
+	if [ "${1:-}" = "clean" ]; then
 		echo "make dirclean"
 		make dirclean
 	fi
-	make -j8 download V=s || exit 1
-	#make -j$(($(nproc) + 1)) V=s || exit 2
-	make -j$(($(nproc) + 1)) V=s || make -j1 V=s || exit 2
-	#make -j$(nproc) || make -j1 || make -j1 V=s
+	make -j8 download V=s
+	# make -j"$(( $(nproc) + 1 ))" V=s
+	make -j"$(( $(nproc) + 1 ))" V=s || make -j1 V=s
+	# make -j"$(nproc)" || make -j1 || make -j1 V=s
 	echo "-----------end-------------"
-	#cd $ORI_DIR
 }
 
-case "$1" in
+command="${1:-}"
+target="${2:-}"
+
+case "$command" in
 	update)
 		update_code
 		;;
-        check)
-                check_config $2
-                ;;
-	check_test)
-		check_test_config $2
+	check)
+		check_config "$target"
 		;;
-        build)
-                build_code $2
-                ;;
-        *)
-                echo "error command"
-		echo "check or build"
+	build)
+		build_code "$target"
+		;;
+	*)
+		echo "error command: ${command:-<empty>}" >&2
+		echo "usage: $0 {update|check|build} [r2s|clean]" >&2
+		exit 1
+		;;
 esac

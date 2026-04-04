@@ -148,7 +148,7 @@ jobs:
 
     - name: Organize files
       id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: success() && env.UPLOAD_FIRMWARE == 'true'
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
@@ -157,14 +157,14 @@ jobs:
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
-      if: steps.organize.outputs.status == 'success' && !cancelled()
+      if: success() && steps.organize.outputs.status == 'success'
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
     - name: Upload firmware to cowtransfer
       id: cowtransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
+      if: success() && steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true'
       run: |
         curl -fsSL git.io/file-transfer | sh
         ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
@@ -173,7 +173,7 @@ jobs:
 
     - name: Upload firmware to WeTransfer
       id: wetransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+      if: success() && steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true'
       run: |
         curl -fsSL git.io/file-transfer | sh
         ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
@@ -182,7 +182,7 @@ jobs:
 
     - name: Generate release tag
       id: tag
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: success() && steps.organize.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       run: |
         echo "::set-output name=release_tag::AMD64-STABLE-$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
@@ -192,7 +192,7 @@ jobs:
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
+      if: success() && steps.tag.outputs.status == 'success'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -202,13 +202,14 @@ jobs:
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
+      if: success()
       with:
         retain_days: 1
         keep_minimum_runs: 3
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@v0.2.0
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: success() && steps.tag.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       with:
         keep_latest: 3
         delete_tags: true

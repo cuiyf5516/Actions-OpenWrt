@@ -27,6 +27,10 @@ on:
         required: true
         type: string
 
+permissions:
+  actions: write
+  contents: write
+
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
@@ -196,7 +200,7 @@ jobs:
         echo "status=success" >> "$GITHUB_OUTPUT"
 
     - name: Upload firmware to release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       if: success() && steps.tag.outputs.status == 'success'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -206,14 +210,14 @@ jobs:
         files: ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
-      uses: GitRML/delete-workflow-runs@main
+      uses: Mattraks/delete-workflow-runs@v2
       if: success()
       with:
         retain_days: 1
         keep_minimum_runs: 3
 
     - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@v0.2.0
+      uses: dev-drprasad/delete-older-releases@v0.3.4
       if: success() && steps.tag.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true'
       with:
         keep_latest: 3

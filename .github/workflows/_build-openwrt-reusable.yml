@@ -32,7 +32,8 @@ permissions:
   contents: write
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
+  # REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_URL: https://github.com/immortalwrt/immortalwrt
   REPO_BRANCH: master
   DEPENDS_FILE: depends-ubuntu
   FEEDS_CONF: feeds.conf.default

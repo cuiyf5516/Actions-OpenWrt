@@ -19,7 +19,8 @@ resolve_repo_dir() {
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(resolve_repo_dir)"
-LEDE_DIR="$SCRIPT_DIR/lede"
+#LEDE_DIR="$SCRIPT_DIR/lede"
+LEDE_DIR="$SCRIPT_DIR/immortalwrt"
 
 detect_go_bootstrap_root() {
 	local go_bin go_root

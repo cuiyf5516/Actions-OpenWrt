@@ -21,6 +21,61 @@ SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(resolve_repo_dir)"
 LEDE_DIR="$SCRIPT_DIR/lede"
 
+detect_go_bootstrap_root() {
+	local go_bin go_root
+
+	if ! go_bin="$(command -v go 2>/dev/null)"; then
+		return 1
+	fi
+
+	go_root="$(go env GOROOT 2>/dev/null || true)"
+	if [ -n "$go_root" ] && [ -x "$go_root/bin/go" ]; then
+		printf '%s\n' "$go_root"
+		return 0
+	fi
+
+	case "$go_bin" in
+		/usr/bin/go)
+			if [ -x /usr/lib/go/bin/go ]; then
+				printf '%s\n' "/usr/lib/go"
+				return 0
+			fi
+			;;
+	esac
+
+	return 1
+}
+
+prepare_golang_bootstrap() {
+	local host_arch bootstrap_root
+
+	host_arch="$(uname -m)"
+	case "$host_arch" in
+		aarch64|arm64)
+			;;
+		*)
+			return 0
+			;;
+	esac
+
+	if ! bootstrap_root="$(detect_go_bootstrap_root)"; then
+		echo "error: ARM64 host detected but no usable system Go bootstrap was found." >&2
+		echo "error: Install Go before building, or set CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT manually." >&2
+		exit 1
+	fi
+
+	echo "----------configuring golang bootstrap for $host_arch---------"
+	cd "$LEDE_DIR"
+	if [ -f .config ] && grep -q '^CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=' .config; then
+		sed -i.bak "s|^CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=.*|CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=\"$bootstrap_root\"|" .config
+	else
+		printf '\nCONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT="%s"\n' "$bootstrap_root" >> .config
+	fi
+	rm -f .config.bak
+	echo "using CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=$bootstrap_root"
+	echo "-----------end-------------"
+}
+
 update_code() {
 	echo "----------updating---------"
 	cd "$LEDE_DIR"
@@ -60,6 +115,7 @@ build_code() {
 		echo "make dirclean"
 		make dirclean
 	fi
+	prepare_golang_bootstrap
 	make -j8 download V=s
 	# make -j"$(( $(nproc) + 1 ))" V=s
 	make -j"$(( $(nproc) + 1 ))" V=s || make -j1 V=s

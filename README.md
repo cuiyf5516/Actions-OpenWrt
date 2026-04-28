@@ -1,40 +1,39 @@
-**English** | [中文](https://p3terx.com/archives/build-openwrt-with-github-actions.html)
-
 # Actions-OpenWrt
 
-[![LICENSE](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square&label=LICENSE)](https://github.com/P3TERX/Actions-OpenWrt/blob/master/LICENSE)
-![GitHub Stars](https://img.shields.io/github/stars/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Stars&logo=github)
-![GitHub Forks](https://img.shields.io/github/forks/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Forks&logo=github)
+基于 GitHub Actions 自动编译 OpenWrt 固件。
 
-A template for building OpenWrt with GitHub Actions
+## 🛠️ 使用方法
 
-## Usage
+1. **配置文件**：在 `config/` 目录下准备你的 `.config`（如 `amd64.config` 或 `r2s.config`）。
+2. **自定义脚本**：
+   - 编辑 `diy-part1.sh` 修改插件源。
+   - 编辑 `diy-part2.sh` 进行源码微调。
+3. **手动触发**：
+   - 在 GitHub **Actions** 页面选择对应的工作流。
+   - 点击 **Run workflow** 开始编译。
+4. **获取固件**：编译成功后在 **Artifacts** 处下载。
 
-- Click the [Use this template](https://github.com/P3TERX/Actions-OpenWrt/generate) button to create a new repository.
-- Generate `.config` files using [Lean's OpenWrt](https://github.com/coolsnowwolf/lede) source code. ( You can change it through environment variables in the workflow file. )
-- Push `.config` file to the GitHub repository.
-- Select `Build OpenWrt` on the Actions page.
-- Click the `Run workflow` button.
-- When the build is complete, click the `Artifacts` button in the upper right corner of the Actions page to download the binaries.
+## 📝 脚本及文件说明
 
-## Tips
+- `depends-ubuntu`: 编译所需的 Ubuntu 依赖包列表。
+- `.github/workflows/`: 包含具体设备的流水线定义及可复用构建逻辑。
 
-- It may take a long time to create a `.config` file and build the OpenWrt firmware. Thus, before create repository to build your own firmware, you may check out if others have already built it which meet your needs by simply [search `Actions-Openwrt` in GitHub](https://github.com/search?q=Actions-openwrt).
-- Add some meta info of your built firmware (such as firmware architecture and installed packages) to your repository introduction, this will save others' time.
+## 🤝 Credits & 致谢
 
-## Credits
+本项目基于 [P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt) 模板，并引用了以下项目与插件：
 
 - [Microsoft Azure](https://azure.microsoft.com)
 - [GitHub Actions](https://github.com/features/actions)
 - [OpenWrt](https://github.com/openwrt/openwrt)
 - [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)
-- [cimmortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt)
+- [immortalwrt/immortalwrt](https://github.com/immortalwrt/immortalwrt)
 - [Mikubill/transfer](https://github.com/Mikubill/transfer)
 - [softprops/action-gh-release](https://github.com/softprops/action-gh-release)
 - [Mattraks/delete-workflow-runs](https://github.com/Mattraks/delete-workflow-runs)
 - [dev-drprasad/delete-older-releases](https://github.com/dev-drprasad/delete-older-releases)
 - [peter-evans/repository-dispatch](https://github.com/peter-evans/repository-dispatch)
 
-## License
+## 📄 License
 
-[MIT](https://github.com/P3TERX/Actions-OpenWrt/blob/main/LICENSE) © [**P3TERX**](https://p3terx.com)
+本项目遵循 [MIT License](./LICENSE) 许可协议。
+Copyright (c) 2019-2020 **P3TERX** & 2021-2026 **cuiyf5516**

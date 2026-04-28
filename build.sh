@@ -1,4 +1,15 @@
 #!/bin/bash
+#
+# https://github.com/cuiyf5516/Actions-OpenWrt
+#
+# File: build.sh
+# Description: Local build script for OpenWrt
+#
+# Copyright (c) 2021-2026 cuiyf5516 <yjcuiyf@gmail.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
 
 set -eu
 

@@ -1,11 +1,14 @@
 #
+# https://github.com/cuiyf5516/Actions-OpenWrt
+#
+# File: .github/workflows/_build-openwrt-reusable.yml
+# Description: Reusable OpenWrt build workflow
+#
 # Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
+# Copyright (c) 2021-2026 cuiyf5516 <yjcuiyf@gmail.com>
 #
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# Description: Reusable OpenWrt build workflow
 #
 
 name: Reusable OpenWrt Build

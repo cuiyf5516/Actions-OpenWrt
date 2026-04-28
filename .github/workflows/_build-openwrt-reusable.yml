@@ -94,6 +94,7 @@ jobs:
       uses: stupidloud/cachewrtbuild@main
       with:
         ccache: 'true'
+        toolchain: 'false'
         mixkey: ${{ inputs.cache_mixkey }}
         prefix: ${{ github.workspace }}/openwrt
 

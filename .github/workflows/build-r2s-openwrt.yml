@@ -24,6 +24,10 @@ on:
 #    - cron: 0 14 * * 5
 #      timezone: Asia/Shanghai
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   build:
     uses: ./.github/workflows/_build-openwrt-reusable.yml

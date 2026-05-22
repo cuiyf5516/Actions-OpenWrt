@@ -33,6 +33,5 @@ jobs:
     uses: ./.github/workflows/_build-openwrt-reusable.yml
     with:
       config_file: config/amd64.config
-      cache_mixkey: amd64
       release_prefix: AMD64
     secrets: inherit

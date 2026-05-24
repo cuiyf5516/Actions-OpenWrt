@@ -168,8 +168,8 @@ build_code() {
 	fi
 	prepare_golang_bootstrap
 	make -j8 download V=s
-	# make -j"$(( $(nproc) + 1 ))" V=s
-	make -j"$(( $(nproc) + 1 ))" V=s || make -j1 V=s
+	# make -j"$(nproc)" V=s
+	make -j"$(nproc)" V=s || make -j1 V=s
 	# make -j"$(nproc)" || make -j1 || make -j1 V=s
 	echo "-----------end-------------"
 }

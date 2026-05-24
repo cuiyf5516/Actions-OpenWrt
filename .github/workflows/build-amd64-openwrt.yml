@@ -14,7 +14,7 @@
 name: Build AMD64 OpenWrt
 
 concurrency:
-  group: build-amd64-openwrt-${{ github.ref }}
+  group: build-amd64-${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:

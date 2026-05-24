@@ -14,7 +14,7 @@
 name: Build R2S OpenWrt
 
 concurrency:
-  group: build-r2s-openwrt-${{ github.ref }}
+  group: build-r2s-${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:

@@ -20,6 +20,15 @@ concurrency:
 on:
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      source:
+        description: Source repository
+        required: true
+        default: immortalwrt
+        type: choice
+        options:
+          - immortalwrt
+          - lede
   schedule:
     - cron: 0 14 * * 5 
       timezone: Asia/Shanghai 
@@ -32,6 +41,7 @@ jobs:
   build:
     uses: ./.github/workflows/_build-openwrt-reusable.yml
     with:
-      config_file: config/amd64.config
-      release_prefix: AMD64
+      source: ${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}
+      config_file: config/${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}/amd64.config
+      release_prefix: AMD64-${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}
     secrets: inherit

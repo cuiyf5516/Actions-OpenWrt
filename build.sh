@@ -30,8 +30,50 @@ resolve_repo_dir() {
 
 SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(resolve_repo_dir)"
-#LEDE_DIR="$SCRIPT_DIR/lede"
-LEDE_DIR="$SCRIPT_DIR/immortalwrt"
+DEFAULT_SOURCE="immortalwrt"
+SOURCE="$DEFAULT_SOURCE"
+LEDE_DIR="$SCRIPT_DIR/$SOURCE"
+
+usage() {
+	echo "usage: $0 update [immortalwrt|lede]" >&2
+	echo "       $0 check [immortalwrt|lede] [amd64|r2s]" >&2
+	echo "       $0 build [immortalwrt|lede] [clean]" >&2
+	echo "compat: $0 check r2s" >&2
+}
+
+is_source() {
+	case "${1:-}" in
+		immortalwrt|lede)
+			return 0
+			;;
+		*)
+			return 1
+			;;
+	esac
+}
+
+set_source() {
+	SOURCE="${1:-$DEFAULT_SOURCE}"
+	if ! is_source "$SOURCE"; then
+		echo "error source: $SOURCE" >&2
+		usage
+		exit 1
+	fi
+	LEDE_DIR="$SCRIPT_DIR/$SOURCE"
+}
+
+validate_target() {
+	case "${1:-}" in
+		amd64|r2s)
+			return 0
+			;;
+		*)
+			echo "error target: ${1:-<empty>}" >&2
+			usage
+			exit 1
+			;;
+	esac
+}
 
 detect_go_bootstrap_root() {
 	local go_bin go_root
@@ -101,11 +143,8 @@ update_code() {
 }
 
 check_config() {
-	local config_file="config/amd64.config"
-
-	if [ "${1:-}" = "r2s" ]; then
-		config_file="config/r2s.config"
-	fi
+	local target="${1:-amd64}"
+	local config_file="config/$SOURCE/$target.config"
 
 	echo "----------checking $config_file---------"
 	cd "$LEDE_DIR"
@@ -136,21 +175,77 @@ build_code() {
 }
 
 command="${1:-}"
-target="${2:-}"
+if [ "$#" -gt 0 ]; then
+	shift
+fi
 
 case "$command" in
 	update)
+		if [ "$#" -gt 1 ]; then
+			echo "error: too many arguments for update" >&2
+			usage
+			exit 1
+		fi
+		set_source "${1:-$DEFAULT_SOURCE}"
 		update_code
 		;;
 	check)
+		source="$DEFAULT_SOURCE"
+		target="amd64"
+		if [ "$#" -gt 0 ]; then
+			if is_source "$1"; then
+				source="$1"
+				target="${2:-amd64}"
+				if [ "$#" -gt 2 ]; then
+					echo "error: too many arguments for check" >&2
+					usage
+					exit 1
+				fi
+			else
+				target="$1"
+				if [ "$#" -gt 1 ]; then
+					echo "error: too many arguments for check" >&2
+					usage
+					exit 1
+				fi
+			fi
+		fi
+		validate_target "$target"
+		set_source "$source"
 		check_config "$target"
 		;;
 	build)
-		build_code "$target"
+		source="$DEFAULT_SOURCE"
+		build_arg=""
+		if [ "$#" -gt 0 ]; then
+			if is_source "$1"; then
+				source="$1"
+				build_arg="${2:-}"
+				if [ "$#" -gt 2 ]; then
+					echo "error: too many arguments for build" >&2
+					usage
+					exit 1
+				fi
+			else
+				build_arg="$1"
+				if [ "$#" -gt 1 ]; then
+					echo "error: too many arguments for build" >&2
+					usage
+					exit 1
+				fi
+			fi
+		fi
+		if [ -n "$build_arg" ] && [ "$build_arg" != "clean" ]; then
+			echo "error build argument: $build_arg" >&2
+			usage
+			exit 1
+		fi
+		set_source "$source"
+		build_code "$build_arg"
 		;;
 	*)
 		echo "error command: ${command:-<empty>}" >&2
-		echo "usage: $0 {update|check|build} [r2s|clean]" >&2
+		usage
 		exit 1
 		;;
 esac

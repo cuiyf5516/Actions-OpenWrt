@@ -43,5 +43,6 @@ jobs:
     with:
       source: ${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}
       config_file: config/${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}/r2s.config
+      cache_mixkey: aarch64-${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}
       release_prefix: R2S-${{ inputs.source || github.event.client_payload.source || 'immortalwrt' }}
     secrets: inherit

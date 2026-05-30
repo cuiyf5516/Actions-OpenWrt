@@ -22,6 +22,9 @@ on:
       config_file:
         required: true
         type: string
+      cache_mixkey:
+        required: true
+        type: string
       release_prefix:
         required: true
         type: string
@@ -100,6 +103,14 @@ jobs:
         echo "Using source: $SOURCE ($REPO_URL@$REPO_BRANCH)"
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+    - name: Cache
+      uses: stupidloud/cachewrtbuild@main
+      with:
+        ccache: 'true'
+        toolchain: 'false'
+        mixkey: ${{ inputs.cache_mixkey }}
+        prefix: ${{ github.workspace }}/openwrt
 
     - name: Load custom feeds
       run: |
